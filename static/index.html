@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAMILY MEDS & HEALTH TRACKER // 24/7 WELLNESS MONITOR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-badge">MED-CORE</div>
+      <span class="brand-title">FAMILY MEDS & HEALTH TRACKER</span>
+      <span class="brand-sub font-mono">24/7 DOSAGE REMINDERS // VITALS JOURNAL</span>
+    </div>
+    <div class="metrics-bar">
+      <div class="metric-item">
+        <span class="label">LOW STOCK</span>
+        <span class="value font-mono text-amber" id="metricLowStock">1 ALERT</span>
+      </div>
+      <div class="metric-item">
+        <span class="label">DOSES TODAY</span>
+        <span class="value font-mono text-mint" id="metricDosesToday">0 TAKEN</span>
+      </div>
+      <div class="metric-item">
+        <span class="label">PORT</span>
+        <span class="value font-mono">8018</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Workspace -->
+  <main class="workspace">
+    <!-- Left Panel: Family Member Profiles & Low Stock -->
+    <aside class="panel side-panel">
+      <div class="panel-header">
+        <span class="panel-title">FAMILY PROFILES</span>
+        <button class="mini-btn text-mint" id="btnAddMemberModal">+ MEMBER</button>
+      </div>
+
+      <!-- Member Filter List -->
+      <div class="members-list" id="membersList"></div>
+
+      <!-- Low Stock Warning Card -->
+      <div class="low-stock-card" id="lowStockSection">
+        <div class="card-title text-amber">⚠️ REFILL ALERTS (&lt; 7 DAYS)</div>
+        <div class="refill-items" id="refillItemsList"></div>
+      </div>
+
+      <!-- Quick Action: Log Vitals -->
+      <button class="btn btn-mint mt-auto" id="btnOpenVitalsModal">+ LOG BLOOD PRESSURE / VITALS</button>
+      <button class="btn mt-6" id="btnOpenAddMedModal">+ ADD MEDICATION SCHEDULE</button>
+    </aside>
+
+    <!-- Main Viewport: Tabs (Schedule vs Vitals) -->
+    <section class="main-viewport">
+      <div class="view-tabs">
+        <button class="v-tab active" data-tab="schedule">MEDICATION SCHEDULE</button>
+        <button class="v-tab" data-tab="vitals">VITALS & BLOOD PRESSURE JOURNAL</button>
+      </div>
+
+      <!-- Tab 1: Medication Schedule -->
+      <div class="tab-pane active" id="paneSchedule">
+        <div class="schedule-grid">
+          <!-- Morning -->
+          <div class="time-column">
+            <div class="time-header">
+              <span class="time-name">MORNING [08:00]</span>
+              <span class="time-sub">Breakfast Phase</span>
+            </div>
+            <div class="med-cards-container" id="morningMeds"></div>
+          </div>
+          <!-- Afternoon -->
+          <div class="time-column">
+            <div class="time-header">
+              <span class="time-name">AFTERNOON [13:00]</span>
+              <span class="time-sub">Lunch Phase</span>
+            </div>
+            <div class="med-cards-container" id="afternoonMeds"></div>
+          </div>
+          <!-- Evening -->
+          <div class="time-column">
+            <div class="time-header">
+              <span class="time-name">EVENING [19:00]</span>
+              <span class="time-sub">Dinner Phase</span>
+            </div>
+            <div class="med-cards-container" id="eveningMeds"></div>
+          </div>
+          <!-- Night -->
+          <div class="time-column">
+            <div class="time-header">
+              <span class="time-name">NIGHT [22:00]</span>
+              <span class="time-sub">Bedtime Phase</span>
+            </div>
+            <div class="med-cards-container" id="nightMeds"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Vitals Journal -->
+      <div class="tab-pane hidden" id="paneVitals">
+        <div class="vitals-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>TIMESTAMP</th>
+                <th>MEMBER</th>
+                <th>BLOOD PRESSURE (SYS / DIA)</th>
+                <th>PULSE (BPM)</th>
+                <th>GLUCOSE (MMOL/L)</th>
+                <th>EVALUATION</th>
+                <th>NOTES</th>
+              </tr>
+            </thead>
+            <tbody id="vitalsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Log Vitals -->
+  <div class="overlay hidden" id="vitalsModal">
+    <div class="modal-card">
+      <div class="modal-badge">BIOMETRIC LOG</div>
+      <h2 class="modal-title">RECORD HEALTH VITALS</h2>
+      <div class="modal-form">
+        <div class="input-row">
+          <label>Family Member:</label>
+          <select id="vitalMemberSelect" class="cyber-select font-mono"></select>
+        </div>
+        <div class="input-row">
+          <label>Systolic (Upper, mmHg):</label>
+          <input type="number" id="vitalSys" placeholder="120" class="cyber-input font-mono">
+        </div>
+        <div class="input-row">
+          <label>Diastolic (Lower, mmHg):</label>
+          <input type="number" id="vitalDia" placeholder="80" class="cyber-input font-mono">
+        </div>
+        <div class="input-row">
+          <label>Heart Pulse (bpm):</label>
+          <input type="number" id="vitalPulse" placeholder="72" class="cyber-input font-mono">
+        </div>
+        <div class="input-row">
+          <label>Blood Glucose (mmol/L):</label>
+          <input type="number" step="0.1" id="vitalGlucose" placeholder="5.2" class="cyber-input font-mono">
+        </div>
+        <div class="input-row">
+          <label>Notes / Context:</label>
+          <input type="text" id="vitalNotes" placeholder="Morning reading, rested..." class="cyber-input">
+        </div>
+        <button class="btn btn-mint mt-12" id="btnSubmitVitals">PERSIST VITALS TO SQLITE</button>
+        <button class="btn" id="btnCloseVitalsModal">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add Medication -->
+  <div class="overlay hidden" id="medModal">
+    <div class="modal-card">
+      <div class="modal-badge">SCHEDULE BUILDER</div>
+      <h2 class="modal-title">REGISTER MEDICATION / VITAMIN</h2>
+      <div class="modal-form">
+        <div class="input-row">
+          <label>Family Member:</label>
+          <select id="medMemberSelect" class="cyber-select font-mono"></select>
+        </div>
+        <div class="input-row">
+          <label>Medication Name:</label>
+          <input type="text" id="medNameInput" placeholder="e.g. Magnesium B6, Amoxicillin..." class="cyber-input font-mono">
+        </div>
+        <div class="input-row">
+          <label>Dosage:</label>
+          <input type="text" id="medDosageInput" placeholder="e.g. 500mg, 1 tablet..." class="cyber-input font-mono">
+        </div>
+        <div class="input-row">
+          <label>Schedule Phase:</label>
+          <select id="medPhaseSelect" class="cyber-select font-mono">
+            <option value="Morning">Morning [08:00]</option>
+            <option value="Afternoon">Afternoon [13:00]</option>
+            <option value="Evening">Evening [19:00]</option>
+            <option value="Night">Night [22:00]</option>
+          </select>
+        </div>
+        <div class="input-row">
+          <label>Meal Relation:</label>
+          <select id="medMealSelect" class="cyber-select font-mono">
+            <option value="Before food">Before food</option>
+            <option value="With food" selected>With food</option>
+            <option value="After food">After food</option>
+          </select>
+        </div>
+        <div class="input-row">
+          <label>Pills in Pack (Stock):</label>
+          <input type="number" id="medStockInput" value="30" class="cyber-input font-mono">
+        </div>
+        <button class="btn btn-mint mt-12" id="btnSubmitMed">SAVE MEDICATION TO SCHEDULE</button>
+        <button class="btn" id="btnCloseMedModal">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/meds.js"></script>
+</body>
+</html>

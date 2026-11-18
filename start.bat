@@ -2,11 +2,21 @@
 chcp 65001 > nul
 title Family Meds Tracker [Port 8018]
 echo ========================================================
-echo   FAMILY MEDS & HEALTH TRACKER // 24/7 WELLNESS HUB
+echo   FAMILY MEDS TRACKER [PORT 8018]
 echo ========================================================
-echo [INFO] Проверка и установка зависимостей...
-python -m pip install -r requirements.txt --quiet
-echo [INFO] Запуск FastAPI веб-сервера на http://localhost:8018 ...
-start http://localhost:8018
-python -m uvicorn main:app --host 0.0.0.0 --port 8018
+
+if exist "C:\Python313\python.exe" (
+    set "PY=C:\Python313\python.exe"
+) else (
+    set "PY=python"
+)
+
+echo [INFO] Проверка и освобождение порта 8018...
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":8018" ^| findstr "LISTENING"') do taskkill /f /pid %%a >nul 2>&1
+
+echo [INFO] Запуск веб-сервера на http://localhost:8018 ...
+start "" cmd /c "timeout /t 2 /nobreak >nul && start http://localhost:8018"
+
+cd /d "%~dp0"
+"%PY%" -m uvicorn main:app --host 127.0.0.1 --port 8018
 pause
